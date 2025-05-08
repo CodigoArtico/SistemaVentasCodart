@@ -236,6 +236,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            alert(data.message);
                             setTimeout(() => location.reload(), 1500);
                         } else {
                             alert(data.message);

@@ -15,7 +15,7 @@ class Caracteristica extends Model
         'nombre',
         'descripcion',
         'estado',
-        'detacado',
+        'destacado',
     ];
 
     //Relaciones tablas
