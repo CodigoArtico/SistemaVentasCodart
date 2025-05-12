@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCategoriaRequest;
 use App\Models\Caracteristica;
+use App\Models\Categoria;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,8 @@ class CategoriaController extends Controller
     public function index()
     {
         //
-        return view('categorias.index');
+        $categorias = Categoria::with('caracteristica')->latest()->get();
+        return view('categorias.index', ['categorias' => $categorias]);
     }
 
     /**

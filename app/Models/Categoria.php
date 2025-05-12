@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Presentaciones extends Model
+class Categoria extends Model
 {
     use HasFactory;
-
     //
-    protected $table = 'presentaciones';
+    protected $table = 'categorias';
 
     protected $fillable = [
         'caracteristica_id',
@@ -18,7 +17,7 @@ class Presentaciones extends Model
 
 
     //Relaciones tablas
-    public function caracteristicas()
+    public function caracteristica()
     {
         return $this->belongsTo(Caracteristica::class);
     }

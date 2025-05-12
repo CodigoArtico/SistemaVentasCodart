@@ -65,6 +65,63 @@
                 </div>
 
                 {{-- Tabla de Categorías --}}
+                <div class="p-4">
+                    <div class="w-full overflow-hidden rounded-lg shadow-xs">
+                        <div class="w-full overflow-x-auto">
+                            <table class="w-full whitespace-no-wrap">
+                                <thead>
+                                    <tr
+                                        class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b
+                                         dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                                        <th class="px-4 py-3">Nombre</th>
+                                        <th class="px-4 py-3">Descripción</th>
+                                        <th class="py-3">Estado / Dest.</th>
+                                        <th class="pl-10 py-3">
+                                            <i class="fa-solid fa-wrench"></i>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                                    @foreach ($categorias as $categoria)
+                                        <tr class="text-gray-700 dark:text-gray-400">
+                                            <td class="px-4 py-1">
+                                                <strong
+                                                    class="text-gray-900 dark:text-gray-200">{{ $categoria->caracteristica->nombre }}</strong>
+                                            </td>
+                                            <td class="px-4 py-1">
+                                                <i class="fa-regular fa-comment-dots mr-2"></i>
+                                                {{ $categoria->caracteristica->descripcion }}
+                                            </td>
+                                            <td class="px-4 py-1">
+                                                @if ($categoria->caracteristica->estado == 1)
+                                                    <i class="fa-solid fa-circle-check text-green-500"></i>
+                                                @else
+                                                    <i class="fa-solid fa-circle-xmark text-gray-400"></i>
+                                                @endif
+
+                                                @if ($categoria->caracteristica->destacado == 1)
+                                                    <i class="fa fa-star text-blue-400 ml-2"></i>
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-1">
+                                                <button
+                                                    class="p-2 text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700"
+                                                    type="button">
+                                                    <i class="fa-regular fa-pen-to-square"></i>
+                                                </button>
+
+                                                <button
+                                                    class="p-2 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-gray-700">
+                                                    <i class="fa-regular fa-trash-can"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
             </div>
 
@@ -245,8 +302,7 @@
                     .catch(error => {
                         console.error('Error:', error);
                     })
-                    .finally(() => {
-                    });
+                    .finally(() => {});
             });
         </script>
     @endpush

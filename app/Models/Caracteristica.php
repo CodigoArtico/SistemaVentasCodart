@@ -21,16 +21,16 @@ class Caracteristica extends Model
     //Relaciones tablas
     public function categorias()
     {
-        return $this->hasMany(Categorias::class);
+        return $this->hasMany(Categoria::class);
     }
 
     public function marcas()
     {
-        return $this->hasMany(Marcas::class);
+        return $this->hasMany(Marca::class);
     }
 
     public function presentaciones()
     {
-        return $this->hasMany(Presentaciones::class);
+        return $this->hasMany(Presentacion::class);
     }
 }

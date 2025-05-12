@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Categorias extends Model
+class Marca extends Model
 {
     use HasFactory;
+
     //
-    protected $table = 'categorias';
+    protected $table = 'marcas';
 
     protected $fillable = [
         'caracteristica_id',
     ];
 
-
     //Relaciones tablas
-    public function caracteristicas()
+    public function caracteristica()
     {
         return $this->belongsTo(Caracteristica::class);
     }
