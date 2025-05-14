@@ -106,7 +106,9 @@
                                             <td class="px-4 py-1">
                                                 <button
                                                     class="p-2 text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700"
-                                                    type="button">
+                                                    type="button" data-modal-target="editarCategoriaModal"
+                                                    data-modal-toggle="editarCategoriaModal"
+                                                    data-id="{{ $categoria->id }}">
                                                     <i class="fa-regular fa-pen-to-square"></i>
                                                 </button>
 
@@ -218,6 +220,86 @@
     </div>
 
 
+    <!-- Modal para editar categoría -->
+    <div id="editarCategoriaModal" tabindex="-1" aria-hidden="true"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 overflow-y-auto overflow-x-hidden">
+        <div class="relative p-4 w-full max-w-2xl">
+            <!-- Modal content -->
+            <div
+                class="relative bg-white rounded-lg shadow dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <!-- Modal header -->
+                <div
+                    class="flex items-center justify-between p-4 md:p-5 border-b border-gray-200 dark:border-gray-700 rounded-t">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        <i class="fas fa-folder-plus mr-2 text-blue-500"></i>
+                        Editar Categoría
+                    </h3>
+                    <button type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto
+                         inline-flex justify-center items-center dark:hover:bg-gray-700 dark:hover:text-white"
+                        data-modal-hide="editarCategoriaModal">
+                        <i class="fas fa-times"></i>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="p-4 md:p-5 space-y-4">
+                    <form id="form-editar-categoria">
+                        <input type="hidden" id="categoria-id" name="id">
+
+                        <div class="mb-5">
+                            <label for="nombre-editar"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Nombre <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="nombre" id="nombre-editar" required
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500
+                                 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                                  dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-200"
+                                placeholder="Ej. Electrónicos">
+                        </div>
+
+                        <div class="mb-5">
+                            <label for="descripcion-editar"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Descripción
+                            </label>
+                            <textarea name="descripcion" id="descripcion-editar" rows="3"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500
+                                 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                                  dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-200"
+                                placeholder="Ej. Productos electrónicos y dispositivos tecnológicos"></textarea>
+                        </div>
+
+                        <div class="flex items-center mb-5">
+                            <input type="checkbox" name="destacado_editar" id="destacado_editar" value="1"
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500
+                                 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                            <label for="destacado_editar"
+                                class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                Marcar como destacado
+                                <span class="text-xs text-gray-500 dark:text-gray-400 block">(Aparecerá en secciones
+                                    especiales)</span>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-center pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <button type="submit"
+                                class="flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800
+                                  transition-all duration-200">
+                                <i class="far fa-floppy-disk mr-2"></i>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @push('js')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -267,6 +349,7 @@
 
                 // Inicializar cada modal
                 setupModal('crearCategoriaModal', '[data-modal-toggle="crearCategoriaModal"]');
+                setupModal('editarCategoriaModal', '[data-modal-toggle="editarCategoriaModal"]');
             });
 
 
@@ -304,6 +387,76 @@
                     })
                     .finally(() => {});
             });
+
+            
+            document.querySelectorAll('[data-modal-toggle="editarCategoriaModal"]').forEach(button => {
+                button.addEventListener('click', async function() {
+                    const id = this.getAttribute('data-id');
+                    const modal = document.getElementById('editarCategoriaModal');
+
+                    try {
+                        const response = await fetch(`/categorias/${id}`);
+                        const data = await response.json();
+
+                        if (data.success) {
+                            document.getElementById('categoria-id').value = data.data.id;
+                            document.getElementById('nombre-editar').value = data.data.caracteristica
+                                ?.nombre || '';
+                            document.getElementById('descripcion-editar').value = data.data.caracteristica
+                                ?.descripcion || '';
+                            document.getElementById('destacado_editar').checked = data.data.caracteristica
+                                ?.destacado == 1;
+
+                            // Mostrar el modal
+                            modal.classList.remove('hidden');
+                        } else {
+                            alert("Error al cargar los datos de la categoría");
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+
+
+            // FUNCION EDITAR CATEGORIA
+            document.querySelector('#form-editar-categoria').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const categoriaId = document.getElementById('categoria-id').value;
+                const nombre = document.getElementById('nombre-editar').value;
+                const descripcion = document.getElementById('descripcion-editar').value;
+                const destacado = document.getElementById('destacado_editar').checked ? 1 : 0;
+
+                const DataSend = {
+                    nombre,
+                    descripcion,
+                    destacado
+                };
+                // console.log(DataSend);
+
+                fetch(`/categorias/${categoriaId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(DataSend)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            console.log('error', data.message || 'Error al actualizar');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    })
+            });
+            
         </script>
     @endpush
 </x-app-layout>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCategoriaRequest;
+use App\Http\Requests\UpdateCaracteristicaRequest;
 use App\Models\Caracteristica;
 use App\Models\Categoria;
 use Exception;
@@ -76,11 +77,16 @@ class CategoriaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Categoria $categoria)
     {
-        //
-    }
+        // Cargar la relación de caracteristica
+        $categoria->load('caracteristica');
 
+        return response()->json([
+            'success' => true,
+            'data' => $categoria,
+        ]);
+    }
     /**
      * Show the form for editing the specified resource.
      */
@@ -92,9 +98,39 @@ class CategoriaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCaracteristicaRequest $request, $id)
     {
         //
+        try{
+            DB::beginTransaction();
+
+            $categoria = Categoria::findOrFail($id);
+
+            $caracteristica = $categoria->caracteristica;
+
+             $caracteristica->update([
+                'nombre' => $request->input('nombre'),
+                'descripcion' => $request->input('descripcion'),
+                'destacado' => $request->input('destacado'), // Por defecto, será 0 si no está marcado
+            ]);
+
+            DB::commit();
+
+             return response()->json([
+                'success' => true,
+                'message' => 'Categoría actualizada con éxito.',
+                'data' => $caracteristica,
+            ], 200);
+
+        }catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar la categoría: ' . $e->getMessage(),
+            ], 500);
+        }
+
     }
 
     /**
