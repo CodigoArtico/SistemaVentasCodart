@@ -139,5 +139,40 @@ class CategoriaController extends Controller
     public function destroy(string $id)
     {
         //
+        $categoria = Categoria::find($id);
+
+        if (!$categoria) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Categoría no encontrada.',
+            ], 404);
+        }
+
+        try {
+            if ($categoria->caracteristica->estado == 1) {
+                Caracteristica::where('id', $categoria->caracteristica->id)
+                    ->update(['estado' => 0]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Categoría eliminada correctamente.',
+                    'action' => 'eliminar',
+                ], 200);
+            } else {
+                Caracteristica::where('id', $categoria->caracteristica->id)
+                    ->update(['estado' => 1]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Categoría restaurada correctamente.',
+                    'action' => 'restaurar',
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar la categoría: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

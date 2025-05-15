@@ -112,10 +112,19 @@
                                                     <i class="fa-regular fa-pen-to-square"></i>
                                                 </button>
 
-                                                <button
-                                                    class="p-2 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-gray-700">
-                                                    <i class="fa-regular fa-trash-can"></i>
-                                                </button>
+                                                @if ($categoria->caracteristica->estado == 1)
+                                                    <button
+                                                        class="p-2 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-gray-700"
+                                                        onclick="abrirModalConfirmacion({{ $categoria->id }}, 1)">
+                                                        <i class="fa-regular fa-trash-can"></i>
+                                                    </button>
+                                                @else
+                                                    <button
+                                                        class="p-2 text-yellow-500 rounded-lg hover:bg-yellow-50 dark:hover:bg-gray-700"
+                                                        onclick="abrirModalConfirmacion({{ $categoria->id }}, 0)">
+                                                        <i class="fa-solid fa-arrow-rotate-right"></i>
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -300,6 +309,52 @@
     </div>
 
 
+    <!-- Modal de confirmación -->
+    <div id="confirmModal" tabindex="-1" aria-hidden="true"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 overflow-y-auto overflow-x-hidden">
+        <div class="relative p-4 w-full max-w-md">
+            <!-- Modal content -->
+            <div
+                class="relative bg-white rounded-lg shadow dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b dark:border-gray-700 rounded-t">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        <i class="fas fa-exclamation-circle mr-2 text-yellow-500"></i>
+                        Confirmación
+                    </h3>
+                    <button type="button" onclick="cerrarModal('confirmModal')"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto
+                         inline-flex justify-center items-center dark:hover:bg-gray-700 dark:hover:text-white">
+                        <i class="fas fa-times"></i>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="p-4 md:p-5 space-y-4">
+                    <p class="text-gray-700 dark:text-gray-300" id="confirmModalBody">
+                        <!-- Mensaje dinámico -->
+                    </p>
+                </div>
+
+                <!-- Modal footer -->
+                <div
+                    class="flex items-center justify-end p-4 md:p-5 border-t dark:border-gray-700 rounded-b space-x-3">
+                    <button type="button" onclick="cerrarModal('confirmModal')"
+                        class="py-2 px-4 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-600
+                         dark:text-gray-300 dark:hover:bg-gray-700 transition-all duration-200">
+                        Cancelar
+                    </button>
+                    <button type="button" id="confirmarEliminacion" data-id="" data-estado=""
+                        class="py-2 px-4 text-sm font-medium text-white rounded-lg transition-all duration-200">
+                        <!-- Texto dinámico -->
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @push('js')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -376,6 +431,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            cerrarModal('crearCategoriaModal');
                             alert(data.message);
                             setTimeout(() => location.reload(), 1500);
                         } else {
@@ -388,7 +444,7 @@
                     .finally(() => {});
             });
 
-            
+
             document.querySelectorAll('[data-modal-toggle="editarCategoriaModal"]').forEach(button => {
                 button.addEventListener('click', async function() {
                     const id = this.getAttribute('data-id');
@@ -446,6 +502,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            cerrarModal('editarCategoriaModal');
                             alert(data.message);
                             setTimeout(() => location.reload(), 1500);
                         } else {
@@ -456,7 +513,98 @@
                         console.error('Error:', error);
                     })
             });
-            
+
+
+            // Función global para cerrar modales
+            function cerrarModal(modalId) {
+                // Simular el click en el botón de cerrar
+                const closeButton = document.querySelector(`#${modalId} [data-modal-hide]`);
+                if (closeButton) {
+                    closeButton.click();
+                } else {
+                    // Fallback si no encuentra el botón
+                    const modal = document.getElementById(modalId);
+                    if (modal) {
+                        modal.classList.add('hidden');
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+
+                        // Disparar evento personalizado si es necesario
+                        const event = new Event('modal-closed');
+                        modal.dispatchEvent(event);
+                    }
+                }
+            }
+
+            // FUNCION MODAL DE CONFIRMACIÓN
+            async function abrirModalConfirmacion(categoriaId, estado) {
+                const modal = document.getElementById('confirmModal');
+                const confirmBtn = document.getElementById('confirmarEliminacion');
+
+                // Resetear el modal primero
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+
+                try {
+                    const response = await fetch(`/categorias/${categoriaId}`);
+                    const categoria = await response.json();
+
+                    const config = {
+                        1: {
+                            mensaje: `¿Seguro que quieres eliminar la categoría <span class="font-bold">"${categoria.data.caracteristica.nombre}"</span>?`,
+                            textoBoton: 'Eliminar',
+                            colorBoton: 'bg-red-600 hover:bg-red-700'
+                        },
+                        0: {
+                            mensaje: `¿Seguro que quieres restaurar la categoría <span class="font-bold">"${categoria.data.caracteristica.nombre}"</span>?`,
+                            textoBoton: 'Restaurar',
+                            colorBoton: 'bg-yellow-500 hover:bg-yellow-600'
+                        }
+                    };
+
+                    document.getElementById('confirmModalBody').innerHTML = config[estado].mensaje;
+                    confirmBtn.textContent = config[estado].textoBoton;
+                    confirmBtn.className =
+                        `py-2 px-4 text-sm font-medium text-white rounded-lg transition-all duration-200 ${config[estado].colorBoton}`;
+                    confirmBtn.setAttribute('data-id', categoriaId);
+                    confirmBtn.setAttribute('data-estado', estado);
+
+                    // Mostrar el modal correctamente
+                    modal.style.display = 'flex';
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+
+                } catch (error) {
+                    console.error('Error al obtener categoría:', error);
+                }
+            }
+
+            // MANEJO DE ELIMINACIÓN/RESTAURACIÓN
+            document.getElementById('confirmarEliminacion').addEventListener('click', async function() {
+                const categoriaId = this.getAttribute('data-id');
+                const url = `/categorias/${categoriaId}`;
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) throw new Error(data.message || 'Error en la operación');
+
+                    // Cerrar modal y mostrar feedback
+                    cerrarModal('confirmModal');
+                    alert(data.message || 'Operación exitosa');
+                    setTimeout(() => location.reload(), 1500);
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {}
+            });
         </script>
     @endpush
 </x-app-layout>
