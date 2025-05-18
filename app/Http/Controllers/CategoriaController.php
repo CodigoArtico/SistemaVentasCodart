@@ -36,9 +36,9 @@ class CategoriaController extends Controller
      */
     public function store(StoreCategoriaRequest $request)
     {
-        Log::info('StoreCategoriaRequest', [
-            'request' => $request->all()
-        ]);
+        // Log::info('StoreCategoriaRequest', [
+        //     'request' => $request->all()
+        // ]);
         //
         try{
             DB::beginTransaction();
@@ -79,7 +79,7 @@ class CategoriaController extends Controller
      */
     public function show(Categoria $categoria)
     {
-        // Cargar la relación de caracteristica
+        // Cargar la categoría con la relación de características
         $categoria->load('caracteristica');
 
         return response()->json([

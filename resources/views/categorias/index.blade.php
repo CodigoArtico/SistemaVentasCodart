@@ -357,6 +357,7 @@
 
     @push('js')
         <script>
+            //FUNCIOMES DE LOS MODALES - APERTURA Y CIERRE
             document.addEventListener('DOMContentLoaded', function() {
                 // Función para manejar todos los modales
                 function setupModal(modalId, toggleSelector = null) {
@@ -407,8 +408,7 @@
                 setupModal('editarCategoriaModal', '[data-modal-toggle="editarCategoriaModal"]');
             });
 
-
-            // RUTAS CONSTANTES
+            // RUTAS CONSTANTES - CSRF TOKEN
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             // FUNCION CREAR CATEGORIA
@@ -444,7 +444,7 @@
                     .finally(() => {});
             });
 
-
+            // FUNCION LLENAR MODAL CATEGORIA
             document.querySelectorAll('[data-modal-toggle="editarCategoriaModal"]').forEach(button => {
                 button.addEventListener('click', async function() {
                     const id = this.getAttribute('data-id');
@@ -473,7 +473,6 @@
                     }
                 });
             });
-
 
             // FUNCION EDITAR CATEGORIA
             document.querySelector('#form-editar-categoria').addEventListener('submit', function(e) {
@@ -514,8 +513,7 @@
                     })
             });
 
-
-            // Función global para cerrar modales
+            // FUNCION CERRAR MODAL - TODOS
             function cerrarModal(modalId) {
                 // Simular el click en el botón de cerrar
                 const closeButton = document.querySelector(`#${modalId} [data-modal-hide]`);
@@ -536,7 +534,7 @@
                 }
             }
 
-            // FUNCION MODAL DE CONFIRMACIÓN
+            // FUNCION MODAL DE CONFIRMACIÓN - ELIMINAR/RESTABLECER CATEGORÍA
             async function abrirModalConfirmacion(categoriaId, estado) {
                 const modal = document.getElementById('confirmModal');
                 const confirmBtn = document.getElementById('confirmarEliminacion');
