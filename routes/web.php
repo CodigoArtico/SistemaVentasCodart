@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resources([
         'categorias' => CategoriaController::class,
+        'marcas' => MarcaController::class,
     ]);
 
 
