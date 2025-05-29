@@ -106,8 +106,8 @@
                                             <td class="px-4 py-1">
                                                 <button
                                                     class="p-2 text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700"
-                                                    type="button" data-modal-target="editarCategoriaModal"
-                                                    data-modal-toggle="editarCategoriaModal"
+                                                    type="button" data-modal-target="editarMarcaModal"
+                                                    data-modal-toggle="editarMarcaModal"
                                                     data-id="{{ $marca->id }}">
                                                     <i class="fa-regular fa-pen-to-square"></i>
                                                 </button>
@@ -229,8 +229,8 @@
     </div>
 
 
-    <!-- Modal para editar categoría -->
-    <div id="editarCategoriaModal" tabindex="-1" aria-hidden="true"
+    <!-- Modal para editar marca -->
+    <div id="editarMarcaModal" tabindex="-1" aria-hidden="true"
         class="hidden fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 overflow-y-auto overflow-x-hidden">
         <div class="relative p-4 w-full max-w-2xl">
             <!-- Modal content -->
@@ -241,12 +241,12 @@
                     class="flex items-center justify-between p-4 md:p-5 border-b border-gray-200 dark:border-gray-700 rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
                         <i class="fas fa-folder-plus mr-2 text-blue-500"></i>
-                        Editar Categoría
+                        Editar Marca
                     </h3>
                     <button type="button"
                         class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto
                          inline-flex justify-center items-center dark:hover:bg-gray-700 dark:hover:text-white"
-                        data-modal-hide="editarCategoriaModal">
+                        data-modal-hide="editarMarcaModal">
                         <i class="fas fa-times"></i>
                         <span class="sr-only">Close modal</span>
                     </button>
@@ -254,8 +254,8 @@
 
                 <!-- Modal body -->
                 <div class="p-4 md:p-5 space-y-4">
-                    <form id="form-editar-categoria">
-                        <input type="hidden" id="categoria-id" name="id">
+                    <form id="form-editar-marca">
+                        <input type="hidden" id="marca-id" name="id">
 
                         <div class="mb-5">
                             <label for="nombre-editar"
@@ -266,7 +266,7 @@
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500
                                  focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
                                   dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-200"
-                                placeholder="Ej. Electrónicos">
+                                placeholder="Ej. Nike">
                         </div>
 
                         <div class="mb-5">
@@ -278,7 +278,7 @@
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500
                                  focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
                                   dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-200"
-                                placeholder="Ej. Productos electrónicos y dispositivos tecnológicos"></textarea>
+                                placeholder="Ej. Productos descripcion de marca"></textarea>
                         </div>
 
                         <div class="flex items-center mb-5">
@@ -405,7 +405,7 @@
 
                 // Inicializar cada modal
                 setupModal('crearMarcasModal', '[data-modal-toggle="crearMarcasModal"]');
-                setupModal('editarCategoriaModal', '[data-modal-toggle="editarCategoriaModal"]');
+                setupModal('editarMarcaModal', '[data-modal-toggle="editarMarcaModal"]');
             });
 
             // FUNCION CERRAR MODAL - TODOS
@@ -463,6 +463,75 @@
                         console.error('Error:', error);
                     })
                     .finally(() => {});
+            });
+
+             // FUNCION LLENAR MODAL MARCA
+            document.querySelectorAll('[data-modal-toggle="editarMarcaModal"]').forEach(button => {
+                button.addEventListener('click', async function() {
+                    const id = this.getAttribute('data-id');
+                    const modal = document.getElementById('editarMarcaModal');
+
+                    try {
+                        const response = await fetch(`/marcas/${id}`);
+                        const data = await response.json();
+
+                        if (data.success) {
+                            document.getElementById('marca-id').value = data.data.id;
+                            document.getElementById('nombre-editar').value = data.data.caracteristica
+                                ?.nombre || '';
+                            document.getElementById('descripcion-editar').value = data.data.caracteristica
+                                ?.descripcion || '';
+                            document.getElementById('destacado_editar').checked = data.data.caracteristica
+                                ?.destacado == 1;
+
+                            // Mostrar el modal
+                            modal.classList.remove('hidden');
+                        } else {
+                            alert("Error al cargar los datos de la marca");
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+
+             // FUNCION EDITAR MARCA
+            document.querySelector('#form-editar-marca').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const marcaId = document.getElementById('marca-id').value;
+                const nombre = document.getElementById('nombre-editar').value;
+                const descripcion = document.getElementById('descripcion-editar').value;
+                const destacado = document.getElementById('destacado_editar').checked ? 1 : 0;
+
+                const DataSend = {
+                    nombre,
+                    descripcion,
+                    destacado
+                };
+                console.log(DataSend);
+
+                fetch(`/marcas/${marcaId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(DataSend)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            cerrarModal('editarMarcaModal');
+                            alert(data.message);
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            console.log('error', data.message || 'Error al actualizar');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    })
             });
         </script>
     @endpush

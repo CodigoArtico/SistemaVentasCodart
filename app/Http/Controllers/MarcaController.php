@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMarcaRequest;
+use App\Http\Requests\UpdateMarcaRequest;
 use App\Models\Caracteristica;
 use App\Models\Marca;
 use Exception;
@@ -35,7 +36,7 @@ class MarcaController extends Controller
     public function store(StoreMarcaRequest $request)
     {
         //
-        try{
+        try {
             DB::beginTransaction();
 
             // Crear la característica
@@ -57,8 +58,7 @@ class MarcaController extends Controller
                 'message' => 'Marca registrada con éxito.',
                 'data' => $marca // Incluye la información de la marca
             ]);
-
-        } catch (Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
             // Retornar error en JSON
             return response()->json([
@@ -72,9 +72,15 @@ class MarcaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Marca $marca)
     {
-        //
+        // Cargar la categoría con la relación de características
+        $marca->load('caracteristica');
+
+        return response()->json([
+            'success' => true,
+            'data' => $marca,
+        ]);
     }
 
     /**
@@ -88,9 +94,37 @@ class MarcaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateMarcaRequest $request, $id)
     {
         //
+        try {
+            DB::beginTransaction();
+
+            $marca = Marca::findOrFail($id);
+
+            $caracteristica = $marca->caracteristica;
+
+            $caracteristica->update([
+                'nombre' => $request->input('nombre'),
+                'descripcion' => $request->input('descripcion'),
+                'destacado' => $request->input('destacado'), // Por defecto, será 0 si no está marcado
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Marca actualizada con éxito.',
+                'data' => $caracteristica,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar la marca: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
