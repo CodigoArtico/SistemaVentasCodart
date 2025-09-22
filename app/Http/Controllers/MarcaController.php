@@ -132,6 +132,34 @@ class MarcaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $marca = Marca::find($id);
+
+        if (!$marca) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Marca no encontrada.',
+            ], 404);
+        }
+
+        if ($marca->caracteristica->estado == 1) {
+            Caracteristica::where('id', $marca->caracteristica->id)
+                ->update(['estado' => 0]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Marca eliminada correctamente.',
+                'action' => 'eliminar',
+            ]);
+        } else {
+            Caracteristica::where('id', $marca->caracteristica->id)
+                ->update(['estado' => 1]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Marca restaurada correctamente.',
+                'action' => 'restaurar',
+            ]);
+        }
+
     }
 }

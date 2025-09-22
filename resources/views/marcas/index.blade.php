@@ -533,6 +533,76 @@
                         console.error('Error:', error);
                     })
             });
+
+            // FUNCION MODAL DE CONFIRMACIÓN - ELIMINAR/RESTABLECER MARCA
+            async function abrirModalConfirmacion(marcaId, estado) {
+                const modal = document.getElementById('confirmModal');
+                const confirmBtn = document.getElementById('confirmarEliminacion');
+
+                // Resetear el modal primero
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+
+                try {
+                    const response = await fetch(`/marcas/${marcaId}`);
+                    const marca = await response.json();
+
+                    const config = {
+                        1: {
+                            mensaje: `¿Seguro que quieres eliminar la marca <span class="font-bold">"${marca.data.caracteristica.nombre}"</span>?`,
+                            textoBoton: 'Eliminar',
+                            colorBoton: 'bg-red-600 hover:bg-red-700'
+                        },
+                        0: {
+                            mensaje: `¿Seguro que quieres restaurar la marca <span class="font-bold">"${marca.data.caracteristica.nombre}"</span>?`,
+                            textoBoton: 'Restaurar',
+                            colorBoton: 'bg-yellow-500 hover:bg-yellow-600'
+                        }
+                    };
+
+                    document.getElementById('confirmModalBody').innerHTML = config[estado].mensaje;
+                    confirmBtn.textContent = config[estado].textoBoton;
+                    confirmBtn.className =
+                        `py-2 px-4 text-sm font-medium text-white rounded-lg transition-all duration-200 ${config[estado].colorBoton}`;
+                    confirmBtn.setAttribute('data-id', marcaId);
+                    confirmBtn.setAttribute('data-estado', estado);
+
+                    // Mostrar el modal correctamente
+                    modal.style.display = 'flex';
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+
+                } catch (error) {
+                    console.error('Error al obtener marca:', error);
+                }
+            }
+
+            // MANEJO DE ELIMINACIÓN/RESTAURACIÓN
+            document.getElementById('confirmarEliminacion').addEventListener('click', async function() {
+                const marcaId = this.getAttribute('data-id');
+                const url = `/marcas/${marcaId}`;
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) throw new Error(data.message || 'Error en la operación');
+
+                    // Cerrar modal y mostrar feedback
+                    cerrarModal('confirmModal');
+                    alert(data.message || 'Operación exitosa');
+                    setTimeout(() => location.reload(), 1500);
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {}
+            });
         </script>
     @endpush
 </x-app-layout>
