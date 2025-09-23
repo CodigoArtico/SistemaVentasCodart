@@ -176,12 +176,6 @@
                                  focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
                                   dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-all duration-200"
                                 placeholder="Ej. Electrónicos">
-                            @error('nombre')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-500 flex items-center">
-                                    <i class="fas fa-exclamation-circle mr-1"></i>
-                                    {{ $message }}
-                                </p>
-                            @enderror
                         </div>
 
                         <div class="mb-5">
@@ -194,12 +188,6 @@
                                  focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
                                   dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500 transition-all duration-200"
                                 placeholder="Ej. Productos electrónicos y dispositivos tecnológicos">{{ old('descripcion') }}</textarea>
-                            @error('descripcion')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-500 flex items-center">
-                                    <i class="fas fa-exclamation-circle mr-1"></i>
-                                    {{ $message }}
-                                </p>
-                            @enderror
                         </div>
 
                         <div class="flex items-center mb-5">

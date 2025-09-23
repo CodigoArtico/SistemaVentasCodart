@@ -29,8 +29,16 @@
             <li class="relative px-6 py-3">
                 <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
                     href="{{route('marcas.index')}}">
-                    <i class="fa-regular fa-folder-open"></i>
+                    <i class="fa-solid fa-tags"></i>
                     <span class="ml-4">Marcas</span>
+                </a>
+            </li>
+
+            <li class="relative px-6 py-3">
+                <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                    href="{{route('presentaciones.index')}}">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span class="ml-4">Presentaciones</span>
                 </a>
             </li>
             
