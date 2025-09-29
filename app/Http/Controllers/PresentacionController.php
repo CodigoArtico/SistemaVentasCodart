@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePresentacionRequest;
+use App\Http\Requests\UpdatePresentacionRequest;
 use App\Models\Caracteristica;
 use App\Models\Presentacion;
 use Exception;
@@ -63,9 +64,15 @@ class PresentacionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Presentacion $presentacione)
     {
-        //
+        // Cargar la relación de caracteristica
+        $presentacione->load('caracteristica');
+
+        return response()->json([
+            'success' => true,
+            'data' => $presentacione,
+        ]);
     }
 
     /**
@@ -79,9 +86,37 @@ class PresentacionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdatePresentacionRequest $request, $id)
     {
         //
+        try {
+            DB::beginTransaction();
+
+            $presentacion = Presentacion::findOrFail($id);
+
+            $caracteristica = $presentacion->caracteristica;
+
+            $caracteristica->update([
+                'nombre' => $request->input('nombre'),
+                'descripcion' => $request->input('descripcion'),
+                'destacado' => $request->input('destacado'), // Por defecto, será 0 si no está marcado
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Presentacion actualizada con éxito.',
+                'data' => $caracteristica,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar la presentacion: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
