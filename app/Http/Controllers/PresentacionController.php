@@ -124,6 +124,33 @@ class PresentacionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $presentacion = Presentacion::find($id);
+
+        if (!$presentacion) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Presentacion no encontrada.',
+            ], 404);
+        }
+
+        if ($presentacion->caracteristica->estado == 1) {
+            Caracteristica::where('id', $presentacion->caracteristica->id)
+                ->update(['estado' => 0]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Presentacion eliminada correctamente.',
+                'action' => 'eliminar',
+            ]);
+        } else {
+            Caracteristica::where('id', $presentacion->caracteristica->id)
+                ->update(['estado' => 1]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Presentacion restaurada correctamente.',
+                'action' => 'restaurar',
+            ]);
+        }
     }
 }

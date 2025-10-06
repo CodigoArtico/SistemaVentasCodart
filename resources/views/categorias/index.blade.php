@@ -216,7 +216,6 @@
         </div>
     </div>
 
-
     <!-- Modal para editar categoría -->
     <div id="editarCategoriaModal" tabindex="-1" aria-hidden="true"
         class="hidden fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 overflow-y-auto overflow-x-hidden">
@@ -296,7 +295,6 @@
         </div>
     </div>
 
-
     <!-- Modal de confirmación -->
     <div id="confirmModal" tabindex="-1" aria-hidden="true"
         class="hidden fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 overflow-y-auto overflow-x-hidden">
@@ -341,7 +339,6 @@
             </div>
         </div>
     </div>
-
 
     @push('js')
         <script>
